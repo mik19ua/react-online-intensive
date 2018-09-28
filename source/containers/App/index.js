@@ -4,6 +4,8 @@ import Feed from 'components/Feed';
 import { hot } from 'react-hot-loader';
 import avatar from 'theme/assets/lisa';
 
+import { Provider } from 'components/HOC/withProfile';
+
 @hot(module)
 export default class App extends Component {
     render () {
@@ -13,6 +15,10 @@ export default class App extends Component {
             currentUserLastName:  'Simpson',
         };
 
-        return <Feed { ...options } />;
+        return (
+            <Provider value = { options }>
+                <Feed />
+            </Provider>
+        );
     }
 }
