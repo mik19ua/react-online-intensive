@@ -17,7 +17,7 @@ export default class App extends Component {
 
         return (
             <Provider value = { options }>
-                <Feed />
+                <Feed { ...options } />
             </Provider>
         );
     }
