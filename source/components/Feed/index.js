@@ -8,7 +8,7 @@ import { getUniqueID, delay } from 'instruments';
 import moment from 'moment';
 
 export default class Feed extends Component {
-    constructor() {
+    constructor () {
         super();
         this._createPost = this._createPost.bind(this);
         this._setPostsFetchingState = this._setPostsFetchingState.bind(this);
@@ -17,8 +17,8 @@ export default class Feed extends Component {
     }
     state = {
         posts: [
-            { id: '1', comment: 'Hi there!', created: 1538631552, likes: [], },
-            { id: '2', comment: 'Hello', created: 1538631619, likes: [], }],
+            { id: '1', comment: 'Hi there!', created: 1538631552, likes: []},
+            { id: '2', comment: 'Hello', created: 1538631619, likes: []}],
         isPostsFetching: false,
     };
 
@@ -26,32 +26,35 @@ export default class Feed extends Component {
         this.setState({
             isPostsFetching: state,
         });
-    };
+    }
 
     async _createPost (comment) {
         this._setPostsFetchingState(true);
         const post = {
-            id: getUniqueID(),
+
+            id:      getUniqueID(),
             created: moment.now(),
             comment,
-            likes: [],
+            likes:   [],
         };
+
         await delay(1200);
 
         this.setState(({ posts }) => ({
-            posts: [post, ...posts],
+            posts:           [post, ...posts],
             isPostsFetching: false,
         }));
     }
 
-     _deletePost (id) {
+    _deletePost (id) {
         this.setState({
-            posts: this.state.posts.filter(post => post.id != id),
+            posts: this.state.posts.filter((post) => post.id !== id),
         });
     }
 
     async _likePost (id) {
-        const { currentUserFirstName, currentUserLastName } = this.props
+        const { currentUserFirstName, currentUserLastName } = this.props;
+
         this._setPostsFetchingState(true);
         await delay(1200);
         const newPosts = this.state.posts.map((post) => {
@@ -60,18 +63,19 @@ export default class Feed extends Component {
                     ...post,
                     likes: [
                         {
-                            id: getUniqueID,
+                            id:        getUniqueID,
                             firstName: currentUserFirstName,
-                            lastName: currentUserLastName
+                            lastName:  currentUserLastName,
                         }
                     ],
                 };
             }
+
             return post;
         });
 
-        this.setState ({
-            posts: newPosts,
+        this.setState({
+            posts:           newPosts,
             isPostsFetching: false,
         });
     }
@@ -80,14 +84,14 @@ export default class Feed extends Component {
         const { posts } = this.state;
         const { isPostsFetching } = this.state;
         const postsJSX = posts.map((post) => {
-            return <Post key = { post.id } { ...post } _likePost = { this._likePost } _deletePost = { this._deletePost } />;
+            return <Post key = { post.id } { ...post } _deletePost = { this._deletePost } _likePost = { this._likePost } />;
         });
 
         return (
             <section className = { Styles.feed }>
                 <Spinner isSpinning = { isPostsFetching } />
                 <StatusBar />
-                <Composer _createPost = { this._createPost }/>
+                <Composer _createPost = { this._createPost } />
                 { postsJSX }
             </section>
         );
