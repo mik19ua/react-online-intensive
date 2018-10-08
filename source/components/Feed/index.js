@@ -47,8 +47,10 @@ export default class Feed extends Component {
     }
 
     _deletePost (id) {
-        this.setState({
-            posts: this.state.posts.filter((post) => post.id !== id),
+        this.setState((prevState) => {
+            return {
+                posts: prevState.posts.filter((post) => post.id !== id),
+            };
         });
     }
 
