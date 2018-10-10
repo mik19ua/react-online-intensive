@@ -4,17 +4,13 @@ import StatusBar from 'components/StatusBar';
 import Composer from 'components/Composer';
 import Post from 'components/Post';
 import Spinner from 'components/Spinner';
+import { withProfile } from 'components/HOC/withProfile';
 import { getUniqueID, delay } from 'instruments';
 import moment from 'moment';
 
+@withProfile
 export default class Feed extends Component {
-    constructor () {
-        super();
-        this._createPost = this._createPost.bind(this);
-        this._setPostsFetchingState = this._setPostsFetchingState.bind(this);
-        this._likePost = this._likePost.bind(this);
-        this._deletePost = this._deletePost.bind(this);
-    }
+
     state = {
         posts: [
             { id: '1', comment: 'Hi there!', created: 1538631552, likes: []},
@@ -22,13 +18,13 @@ export default class Feed extends Component {
         isPostsFetching: false,
     };
 
-    _setPostsFetchingState (state) {
+    _setPostsFetchingState = (state) => {
         this.setState({
             isPostsFetching: state,
         });
     }
 
-    async _createPost (comment) {
+    _createPost = async (comment) => {
         this._setPostsFetchingState(true);
         const post = {
 
@@ -46,15 +42,16 @@ export default class Feed extends Component {
         }));
     }
 
-    _deletePost (id) {
-        this.setState((prevState) => {
-            return {
-                posts: prevState.posts.filter((post) => post.id !== id),
-            };
-        });
+    _deletePost = async (id) => {
+        this._setPostsFetchingState(true);
+        await delay(1200);
+        this.setState(({ posts }) => ({
+            posts:           posts.filter((post) => post.id !== id),
+            isPostsFetching: false,
+        }));
     }
 
-    async _likePost (id) {
+    _likePost = async (id) => {
         const { currentUserFirstName, currentUserLastName } = this.props;
 
         this._setPostsFetchingState(true);
