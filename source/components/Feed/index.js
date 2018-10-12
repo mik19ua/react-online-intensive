@@ -1,89 +1,150 @@
+//Core
 import React, { Component } from 'react';
-import Styles from './styles.m.css';
+
+//Components
+import Catcher from 'components/Catcher';
 import StatusBar from 'components/StatusBar';
 import Composer from 'components/Composer';
 import Post from 'components/Post';
 import Spinner from 'components/Spinner';
 import { withProfile } from 'components/HOC/withProfile';
-import { getUniqueID, delay } from 'instruments';
-import moment from 'moment';
+
+//Instruments
+import Styles from './styles.m.css';
+import { api, TOKEN, GROUP_ID } from 'config/api';
+import { socket } from 'socket/init';
 
 @withProfile
 export default class Feed extends Component {
-
     state = {
-        posts: [
-            { id: '1', comment: 'Hi there!', created: 1538631552, likes: []},
-            { id: '2', comment: 'Hello', created: 1538631619, likes: []}],
+        posts:           [],
         isPostsFetching: false,
     };
+
+    componentDidMount () {
+        const { currentUserFirstName, currentUserLastName } = this.props;
+
+        this._fetchPosts();
+        socket.emit('join', GROUP_ID);
+        socket.on('create', (postJSON) => {
+            const { data: createdPost, meta } = JSON.parse(postJSON);
+
+            if (
+                `${currentUserFirstName} ${currentUserLastName}` !==
+                `${meta.authorFirstName} ${meta.authorLastName}`
+            ) {
+                this.setState(({ posts }) => ({
+                    posts: [createdPost, ...posts],
+                }));
+            }
+        });
+
+        socket.on('remove', (postJSON) => {
+            const { data: deletedPost, meta } = JSON.parse(postJSON);
+
+            if (
+                `${currentUserFirstName} ${currentUserLastName}` !==
+                `${meta.authorFirstName} ${meta.authorLastName}`
+            ) {
+                this.setState(({ posts }) => ({
+                    posts: posts.filter((post) => post.id !== deletedPost.id),
+                }));
+            }
+        });
+    }
+
+    componentWillUnmount () {
+        socket.removeListener('create');
+        socket.removeListener('remove');
+    }
 
     _setPostsFetchingState = (state) => {
         this.setState({
             isPostsFetching: state,
         });
-    }
+    };
+
+    _fetchPosts = async () => {
+        this._setPostsFetchingState(true);
+        console.log('fetching posts');
+        const response = await fetch(api, {
+            method: 'GET',
+        });
+        const { data: posts } = await response.json();
+
+        this.setState({
+            posts,
+            isPostsFetching: false,
+        });
+    };
 
     _createPost = async (comment) => {
         this._setPostsFetchingState(true);
-        const post = {
 
-            id:      getUniqueID(),
-            created: moment.now(),
-            comment,
-            likes:   [],
-        };
+        const response = await fetch(api, {
+            method:  'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization:  TOKEN,
+            },
+            body: JSON.stringify({ comment }),
+        });
 
-        await delay(1200);
+        const { data: post } = await response.json();
 
         this.setState(({ posts }) => ({
             posts:           [post, ...posts],
             isPostsFetching: false,
         }));
-    }
+    };
 
     _deletePost = async (id) => {
         this._setPostsFetchingState(true);
-        await delay(1200);
+        await fetch(`${api}/${id}`, {
+            method:  'DELETE',
+            headers: {
+                Authorization: TOKEN,
+            },
+        });
+
         this.setState(({ posts }) => ({
             posts:           posts.filter((post) => post.id !== id),
             isPostsFetching: false,
         }));
-    }
+    };
 
     _likePost = async (id) => {
-        const { currentUserFirstName, currentUserLastName } = this.props;
-
         this._setPostsFetchingState(true);
-        await delay(1200);
-        const newPosts = this.state.posts.map((post) => {
-            if (post.id === id) {
-                return {
-                    ...post,
-                    likes: [
-                        {
-                            id:        getUniqueID,
-                            firstName: currentUserFirstName,
-                            lastName:  currentUserLastName,
-                        }
-                    ],
-                };
-            }
-
-            return post;
+        const response = await fetch(`${api}/${id}`, {
+            method:  'PUT',
+            headers: {
+                Authorization: TOKEN,
+            },
         });
 
-        this.setState({
-            posts:           newPosts,
+        const { data: likedPost } = await response.json();
+
+        this.setState(({ posts }) => ({
+            posts: posts.map(
+                (post) => post.id === likedPost.id ? likedPost : post
+            ),
             isPostsFetching: false,
-        });
-    }
+        }));
+    };
 
     render () {
         const { posts } = this.state;
         const { isPostsFetching } = this.state;
         const postsJSX = posts.map((post) => {
-            return <Post key = { post.id } { ...post } _deletePost = { this._deletePost } _likePost = { this._likePost } />;
+            return (
+                <Catcher key = { post.id }>
+                    <Post
+                        { ...post }
+                        _deletePost = { this._deletePost }
+                        _likePost = { this._likePost }
+                    />
+                </Catcher>
+            );
         });
 
         return (
@@ -91,7 +152,7 @@ export default class Feed extends Component {
                 <Spinner isSpinning = { isPostsFetching } />
                 <StatusBar />
                 <Composer _createPost = { this._createPost } />
-                { postsJSX }
+                {postsJSX}
             </section>
         );
     }
