@@ -51,13 +51,19 @@ export default class Feed extends Component {
                 }));
             }
         });
-        socket.on('like', (post) => {
-            const { data: likedPost } = JSON.parse(post);
-            this.setState(({ posts }) => ({
-                posts: posts.map(
-                    (post) => post.id === likedPost.id ? likedPost : post
-                ),
-            }));
+        socket.on('like', (postJSON) => {
+            const { data: likedPost, meta } = JSON.parse(postJSON);
+
+            if (
+                `${currentUserFirstName} ${currentUserLastName}` !==
+                `${meta.authorFirstName} ${meta.authorLastName}`
+            ) {
+                this.setState(({ posts }) => ({
+                    posts: posts.map(
+                        (post) => post.id === likedPost.id ? likedPost : post
+                    ),
+                }));
+            }
         });
     }
 
