@@ -8,7 +8,6 @@ import { withProfile } from 'components/HOC/withProfile';
 
 const _animatePostmanExit = (postman) => {
     fromTo(postman, 1, { x: 0 }, { x: 300 });
-    console.log('exiting');
 };
 
 const _animatePostmanEnter = (postman) => {
