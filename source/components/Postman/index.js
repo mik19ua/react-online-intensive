@@ -19,7 +19,7 @@ const Postman = (props) => {
         <Transition
             appear
             in
-            timeout = { 5000 }
+            timeout = { 4000 }
             onEnter = { _animatePostmanEnter }
             onEntered = { _animatePostmanExit }>
             <section className = { Styles.postman }>
