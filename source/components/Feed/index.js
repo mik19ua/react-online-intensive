@@ -14,6 +14,7 @@ import Composer from 'components/Composer';
 import Post from 'components/Post';
 import Postman from 'components/Postman';
 import Spinner from 'components/Spinner';
+import Counter from 'components/Counter';
 import { withProfile } from 'components/HOC/withProfile';
 
 //Instruments
@@ -88,7 +89,6 @@ export default class Feed extends Component {
 
     _fetchPosts = async () => {
         this._setPostsFetchingState(true);
-        console.log('fetching posts');
         const response = await fetch(api, {
             method: 'GET',
         });
@@ -210,6 +210,7 @@ export default class Feed extends Component {
                     onEnter = { this._animateComposerEnter }>
                     <Composer _createPost = { this._createPost } />
                 </Transition>
+                <Counter count = { postsJSX.length } />
                 <Transition
                     appear
                     in
