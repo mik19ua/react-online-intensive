@@ -26,6 +26,7 @@ describe('instruments: ', () => {
         expect(typeof getUniqueID()).toBe('string');
         expect(getUniqueID(5)).toHaveLength(5);
         expect(getUniqueID(13)).toHaveLength(13);
+        expect(getUniqueID()).toHaveLength(15);
     });
     test('getFullApiUrl function should be a function', () => {
         expect(getFullApiUrl).toBeInstanceOf(Function);
@@ -36,10 +37,10 @@ describe('instruments: ', () => {
     test('getFullApiUrl function should throw exception, when called with non-string type as second argument', () => {
         expect(() => getFullApiUrl('test', 1)).toThrow();
     });
-    const apiURL = 'apiURL';
-    const groupId = 'groupId';
-
     test('getFullApiUrl function should produce a string', () => {
+        const apiURL =  'apiURL';
+        const groupId = 'groupId';
+
         expect(typeof getFullApiUrl('test', 'string')).toBe('string');
         expect(getFullApiUrl(apiURL, groupId)).toContain(apiURL, '/', groupId);
     });
