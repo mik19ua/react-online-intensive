@@ -36,8 +36,11 @@ describe('instruments: ', () => {
     test('getFullApiUrl function should throw exception, when called with non-string type as second argument', () => {
         expect(() => getFullApiUrl('test', 1)).toThrow();
     });
+    const apiURL = 'apiURL';
+    const groupId = 'groupId';
+
     test('getFullApiUrl function should produce a string', () => {
         expect(typeof getFullApiUrl('test', 'string')).toBe('string');
-        expect(getFullApiUrl('url', 'id')).toContain('/');
+        expect(getFullApiUrl(apiURL, groupId)).toContain(apiURL, '/', groupId);
     });
 });
