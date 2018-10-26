@@ -20,6 +20,7 @@ const result = mount(<Composer { ...props } />);
 
 const _submitCommentSpy = jest.spyOn(result.instance(), '_submitComment');
 const _handleFormSubmitSpy = jest.spyOn(result.instance(), '_handleFormSubmit');
+const _updateCommentSpy = jest.spyOn(result.instance(), '_updateComment');
 
 describe('Composer component: ', () => {
     test('should have 1 "section" element', () => {
@@ -55,6 +56,10 @@ describe('Composer component: ', () => {
         expect(result.state()).toEqual(initialState);
         expect(result.find('textarea').text()).toBe('');
     });
+    test('_updateComment should be invoked once after textarea changed', () => {
+        result.find('textarea').simulate('change', { target: { value: '1' }});
+        expect(_updateCommentSpy).toHaveBeenCalledTimes(1);
+    });
     test('should handle textarea change event', () => {
         result.find('textarea').simulate('change', {
             target: {
@@ -71,6 +76,7 @@ describe('Composer component: ', () => {
     test('_createPost should be invoked once after form submission', () => {
         expect(props._createPost).toHaveBeenCalledTimes(1);
     });
+
     test('_submitComment and _handleFormSubmit class methods should be invoked once after form submitted', () => {
         expect(_submitCommentSpy).toHaveBeenCalledTimes(1);
         expect(_handleFormSubmitSpy).toHaveBeenCalledTimes(1);
