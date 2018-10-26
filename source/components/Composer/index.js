@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import Styles from './styles.m.css';
 
-class Composer extends Component {
+export class Composer extends Component {
     static propTypes = {
         _createPost: PropTypes.func.isRequired,
     };
@@ -16,11 +16,11 @@ class Composer extends Component {
         this.setState({
             comment: event.target.value,
         });
-    }
+    };
     _handleFormSubmit = (event) => {
         event.preventDefault();
         this._submitComment();
-    }
+    };
 
     _submitComment = () => {
         const { comment } = this.state;
@@ -34,7 +34,7 @@ class Composer extends Component {
         this.setState({
             comment: '',
         });
-    }
+    };
 
     _submitOnEnter = (event) => {
         const enterKey = event.key === 'Enter';
@@ -43,7 +43,7 @@ class Composer extends Component {
             event.preventDefault();
             this._submitComment();
         }
-    }
+    };
 
     render () {
         const { comment } = this.state;
@@ -62,7 +62,6 @@ class Composer extends Component {
                     <input type = 'submit' value = 'Post' />
                 </form>
             </section>
-
         );
     }
 }
