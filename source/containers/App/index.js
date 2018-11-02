@@ -11,23 +11,36 @@ import Login from 'components/Login';
 
 import { Provider } from 'components/HOC/withProfile';
 
+const options = {
+    avatar,
+    currentUserFirstName: 'Виктор',
+    currentUserLastName:  'Чорнопиский',
+    isAuthinticated:      false,
+};
+
 @hot(module)
 export default class App extends Component {
-    render () {
-        const options = {
-            avatar,
-            currentUserFirstName: 'Виктор',
-            currentUserLastName:  'Чорнопиский',
-        };
+    _login = () => {
+        options.isAuthinticated = true;
+    };
 
+    _logout = () => {
+        options.isAuthinticated = false;
+    };
+
+    render () {
         return (
             <Catcher>
                 <Provider value = { options }>
-                    <StatusBar />
+                    <StatusBar _logout = { this._logout } />
                     <Switch>
+                        <Route
+                            path = '/login'
+                            render = { () => <Login _login = { this._login } /> }
+                        />
+                        {!options.isAuthinticated && <Redirect to = '/login' />}
                         <Route component = { Feed } path = '/feed' />
                         <Route component = { Profile } path = '/profile' />
-                        <Route component = { Login } path = '/login' />
                         <Redirect to = '/feed' />
                     </Switch>
                 </Provider>

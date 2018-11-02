@@ -6,11 +6,13 @@ import { withProfile } from 'components/HOC/withProfile';
 import { socket } from 'socket/init';
 import cx from 'classnames';
 import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 
 @withProfile
 export default class StatusBar extends Component {
     state = {
-        online: false,
+        online:          false,
+        redirectToLogin: false,
     };
 
     componentDidMount () {
@@ -33,6 +35,13 @@ export default class StatusBar extends Component {
 
     _animateStatusBarEnter = (statusBar) => {
         fromTo(statusBar, 1, { opacity: 0 }, { opacity: 1 });
+    };
+
+    _logout = () => {
+        this.props._logout();
+        this.setState({
+            redirectToLogin: true,
+        });
     };
 
     render () {
@@ -61,6 +70,8 @@ export default class StatusBar extends Component {
                         <span>{currentUserFirstName}</span>
                     </Link>
                     <Link to = '/feed'>Feed</Link>
+                    <button onClick = { this._logout }>Logout</button>
+                    {this.state.redirectToLogin && <Redirect to = '/' />}
                 </section>
             </Transition>
         );
